@@ -1,0 +1,71 @@
+section
+  #main-cont.row.not-round.section.main-color
+    .row
+      .col-xs-12
+        a(href='/')
+          img.img-center.img-responsive(src='/images/play.png', alt='Reload')
+    block content
+section
+  #contact-cont.row.not-round.section
+    .row
+      .col-xs-12
+        img.img-center.img-responsive(src='/images/contact.png', alt='Contact')
+    .row
+      .col-xs-12
+        p.text-centered.text-contact
+          strong Contact me&colon;
+    form#contact-form(name='contact', method='post', action='/contact',role='form')
+      .row
+        .hidden-xs.col-xs-8.col-xs-offset-2.col-sm-4.col-sm-offset-4
+          .form-group
+            input#contact_name.form-control.form-input-color(type='text', name='contact_name', placeholder='Your name')
+      .row
+        .visible-xs.col-xs-2
+        .visible-xs.col-xs-8
+          .form-group
+            input#contact_name.form-control.form-input-color(type='text', name='contact_name', placeholder='Your name')
+      .row
+        .hidden-xs.col-sm-4.col-sm-offset-4
+          .form-group
+            input#contact_email.form-control.form-input-color(type='email', name='contact_mail', placeholder='Your email')
+      .row
+        .visible-xs.col-xs-2
+        .visible-xs.col-xs-8
+          .form-group
+            input#contact_email.form-control.form-input-color(type='email', name='contact_mail', placeholder='Your email')
+      .row
+        .hidden-xs.col-sm-4.col-sm-offset-4
+          .form-group
+            textarea#contact_msg.form-control.form-input-color(name='contact_msg', placeholder='Your message', rows='3')
+      .row
+        .visible-xs.col-xs-2
+        .visible-xs.col-xs-8
+          .form-group
+            textarea#contact_msg.form-control.form-input-color(name='contact_msg', placeholder='Your message', rows='3')
+      .row
+        .hidden-xs.col-sm-4.col-sm-offset-4
+          button.btn.form-btn.full-width(type='submit') Send
+          br
+          br
+      .row
+        .visible-xs.col-xs-2
+        .visible-xs.col-xs-8
+          button.btn.form-btn.full-width(type='submit') Send
+          br
+          br
+section
+  #footer-cont.row.not-round.footer-style
+    #footer-head.col-xs-12
+      .col-xs-10.col-sm-8.col-md-5.footer-head-left
+        p.footer-text.footer-text-margin
+          strong Being social
+        p
+          hr
+        p.footer-text.footer-text-margin
+          span
+            img(src='/images/twitter.png')
+          &NonBreakingSpace;
+          a(href='https://twitter.com/jorge_couchet', target='_blank') &commat;jorge&UnderBar;couchet
+    #footer-foot.col-xs-12.footer-foot-style.text-centered
+      p.footer-text
+        strong by Jorge Couchet

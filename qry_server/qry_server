@@ -1,0 +1,293 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+
+#
+# 'qry_server/qry_server'
+# 
+# Copyright (C) 2013 Jorge Couchet <jorge.couchet at gmail.com>
+#
+# This file is part of 'ted-scimu'
+# 
+# 'ted-scimu' is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# 'ted-scimu' is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with 'ted-scimu'.  If not, see <http ://www.gnu.org/licenses/>.
+#
+
+
+import socket
+import re
+import sys
+import SocketServer
+import errno
+import getopt
+import os
+import threading
+import argparse
+import Image
+import time
+import traceback
+import random
+
+import base_tcp_server
+from base_tcp_server import Server
+from base_tcp_server import log
+
+# Server parameters
+LISTEN_ADDRESS = "127.0.0.1"
+LISTEN_PORT = 9777
+LOG_FILENAME = "qry_server.log"
+
+# The token used by the client in order to signal the message's END
+END_PROTOCOL = "##END_SEND##"
+
+# The folder with the filenames with the relationships between the 
+# Science Museum objets and the TED talks
+# ---
+# The name of the file without the extension is also the name of the
+# Science Museum media (the media_id) related to the Science Museum object
+SCIMU_RELATIONSHIPS_FOLDER = "gen_relationships"
+
+
+class options(base_tcp_server.options):
+    listen_port = LISTEN_PORT
+    log_filename = LOG_FILENAME
+
+
+class ScimuObjects(object):
+    """
+    The class in charge to manage the in-memory db with the available Science Museum objects. The database is not being modified
+    by the threads attending the client requests, for this reason it is not needing a thread synchronization mechanism as 
+    'threading.Condition()' or something more sophisticated as a RWlock that is allowing multiple reads while there is not writing.
+    """
+    def __init__(self):
+        self.scimu_objects = []
+
+    def query(self, amount):
+        """
+        It returns a given number of database 's elements selected at random.
+        PARAMETERS:
+           1. amount: The number of database 's elements to return
+        RETURNS:
+           A list with the number of database 's elements in the 'amount' parameter, otherwise an empty list
+   
+        """
+        res = []
+        selected = {}
+        try:
+            if (len(self.scimu_objects) >= amount):
+                count = 1
+                while not count > amount:
+                    pos = random.randint(0, len(self.scimu_objects)-1)
+                    if pos not in selected:
+                        selected[pos] = 1
+                        count = count + 1
+                        res.append(self.scimu_objects[pos])
+        except:
+            pass
+        return res
+
+    def __len__(self):
+        res = -1
+        try:
+            res = len(self.scimu_objects)
+        except:
+            pass
+        return res
+
+
+class Handler(base_tcp_server.Handler):
+    """
+    It is implementing the communication protcol with the clients.
+    """
+    def handle_data(self, line):
+        line = line.replace("\n", "")
+        if END_PROTOCOL in line:
+            response = ""
+            # The client data has the amount of object to retrieve
+            # from the database
+            client_data = self.databuffer
+            self.databuffer = ""
+            # Get the Science Museum objects
+            try:
+                amount = int(client_data)
+                res = scimu_objects.query(amount)
+            except:
+                res = []
+            # Format the response
+            if len(res) > 0:
+                for o in res:
+                    if response == "":
+                        response = o
+                    else:
+                        response = response + ' ' + o
+            # Send the data to the client
+            self.send_data(response)
+            return False
+        else:
+            if self.databuffer == "":
+                self.databuffer = line
+            else:
+                self.databuffer = self.databuffer + " " + line
+            return True
+
+# The server
+class Server(Server):
+    pass
+
+
+def get_all_filenames(path):
+    """
+    It gets all the filenames under a given path.
+    PARAMETERS:
+       1. path: The path to the folder from which to get the filenames
+    RETURNS:
+       A list with the name of the filenames under the given path
+    """
+    res = []
+    try:
+        for (dirpath, dirnames, filenames) in os.walk(path):
+            res = filenames
+    except:
+        log(options.log_file, u"qry_server -> get_all_filenames")
+        log(options.log_file, u"*** TRACEBACK START ***")
+        traceback.print_exc(file=options.log_file)
+        log(options.log_file, u"*** TRACEBACK END ***")
+    return res
+
+
+def load_scimu_objects(filenames, scimu_objects):
+   res = -1
+   """
+   It fills the in-memory database with the relationships between the TED talks and the Science Museum objects.
+   PARAMETERS:
+      1. filenames: A list with file names. Each file name has the data about the relationship between a particular
+         TED talk and a particular Science Museum object
+      2. scimu_objects: The global instance of the in-memory database with the relationships information
+   RETURNS:
+      A positive number if all the process was OK, a negative number otherwise
+   """
+   try:
+       if len(filenames) > 0:
+          for name in filenames:
+             name_parts = name.split('.')
+             media_id = name_parts[0]
+             with open(options.rel_folder + '/' + name, 'r') as f:
+                 content = f.read()
+                 content_parts = content.split('***')
+                 object_content = content_parts[0].strip()
+                 oid = (object_content.split())[2]
+                 ted_content = content_parts[2].strip()
+                 ted_url = (ted_content.split())[2]
+                 scimu_objects.scimu_objects.append(oid + '<->' + ted_url + '<->' + media_id)
+                 f.close()
+          res = 1      
+   except:
+       log(options.log_file, u"qry_server -> load_scimu_objects")
+       log(options.log_file, u"*** TRACEBACK START ***")
+       traceback.print_exc(file=options.log_file)
+       log(options.log_file, u"*** TRACEBACK END ***")
+   return res
+
+
+def tranform_images2thumbnail(path):
+   """
+   It transforms the images under the given path in a thumbnail representation. In order to work it needs the Pyhon PIL library,
+   if the enviroment is Linux, install it with: sudo apt-get install python-imaging
+   PARAMETERS:
+      1. path: The path to the folder with the images to transform
+   RETURNS:
+      Nothing
+   """
+   size = 190, 190
+   filenames = get_all_filenames(path)
+   for filename in filenames:
+       try:
+           filename = path + '/' + filename
+           im = Image.open(filename)
+           im.thumbnail(size, Image.ANTIALIAS)
+           im.save(filename)
+       except:
+           msg = "The filename with error is: " + filename
+           log(options.log_file, msg)
+
+
+# The global instance of the in-memory db with the available Science Museum objects
+scimu_objects = ScimuObjects()
+
+def main():
+
+    parser = argparse.ArgumentParser(description="The backend server for the TED-SCIMU interface. The frontend server is the Node.js process in charge of serving the HTTP requests. The backend server is in charge of helping the frontend with all the heavy work such as: calculating TED talks and Science Museum objects relationships, obtaining the list of all the already calculated relationships and so on. The current implementation is only getting the already calculated relationships between TED talks and Science Museum corpus and sending a set of them to the client")
+
+    parser.add_argument('-t','--thumbnail', help="A flag saying if transforming the images to thumbnails ", choices=['y', 'n'], default='n')
+    parser.add_argument('-l','--log', help="The name of the file for logging ", default='')
+    parser.add_argument('-f','--folder', help="The name of the folder with the files about the already calculated relationships between the TED talks and the Science Museum objects ", metavar='SCIMU_RELATIONSHIPS_FOLDER', default='')
+    parser.add_argument('-m','--media', help="The name where are stored the images from the Science Museum media. If THUMBNAIL == True, then it is required ", metavar='MEDIA_FOLDER', default='')
+    parser.add_argument('-d','--debug', help="A flag saying if is for debugging ", choices=['y', 'n'], default='n')
+    parser.add_argument('-e','--daemonize', help="A flag saying if the script will run as a daemon ", choices=['y', 'n'], default='y')
+
+    args = parser.parse_args()
+
+    if args.thumbnail == 'y':
+        if args.media == "":
+            log(options.log_file, u"When the THUMBNAIL options is enabled it is required the path to the folder with the images from the Science Museum media")
+            sys.exit(0)
+
+    if args.debug == 'y':
+       options.log_file = sys.stdout
+    else:
+        if args.log != '':
+            options.log_filename = args.log
+        else:
+            options.log_filename = LOG_FILENAME
+        options.log_file = open(options.log_filename, "a")
+    sys.stderr = options.log_file
+
+    if args.folder != '':
+        options.rel_folder = args.folder
+    else:
+        options.rel_folder = SCIMU_RELATIONSHIPS_FOLDER 
+
+
+    addrinfo = socket.getaddrinfo(LISTEN_ADDRESS, options.listen_port, 0, socket.SOCK_STREAM, socket.IPPROTO_TCP)[0]
+
+    # Creating the server with the extra argument 'log_file'.
+    server = Server(addrinfo[4], Handler, options.log_file)
+
+    # Loading the in-memory database with the available Science Museum objects
+    res = load_scimu_objects(get_all_filenames(options.rel_folder), scimu_objects)
+    if res < 0:
+        log(options.log_file, u" There was a problem loading the database with the Science Museum objects")
+        sys.exit(0) 
+
+    # Transforming the images to thumbnail
+    if args.thumbnail == 'y':
+        tranform_images2thumbnail(args.media)
+
+    log(options.log_file, u" The server is starting")
+
+    if args.daemonize == 'y':
+        log(options.log_file, u"daemonizing")
+        pid = os.fork()
+        if pid != 0:
+            if options.pid_filename:
+                f = open(options.pid_filename, "w")
+                print >> f, pid
+                f.close()
+            sys.exit(0)
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()

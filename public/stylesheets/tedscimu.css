@@ -1,0 +1,295 @@
+
+/*
+
+See at: http://getbootstrap.com/css/ -> Grid Options
+
+Extra small screen / phone < 768
+
+Small screen / table >= 768
+
+Medium screen / desktop >= 992px
+
+Large screen / wide desktop >= 1200px
+
+*/
+
+
+body {
+  /* The navbar has the class 'navbar-fixed-top', so it is needed to add padding to
+   the body in order to compensate the navbar height.
+   See at:  http://getbootstrap.com/components/ -> Fixed to top */
+  padding-top: 70px;
+  /* Used to hide a little gap in the right */
+  overflow-x: hidden;
+}
+
+
+/* It is needed in order to avoid the main window scrolling when opening a modal 
+   See at: http://getbootstrap.com/javascript/#modals
+           http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
+
+   Here is modified a Bootstrap class!
+*/
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal a {
+  color: #025670;
+}
+
+.modal p {
+  color: #1e1f21;
+}
+
+.modal h4 {
+  color: #1e1f21;
+}
+
+
+.modal-header {
+  background-color: #a49c42;
+}
+
+.modal-header .close {
+  color: #FFF;
+}
+
+.modal-body {
+  background-color: #a49c42;
+}
+
+.modal-footer {
+  background-color: #a49c42;
+}
+
+.modal-icon {
+  color: #b44037;
+}
+
+/* It set the style for the popover content  
+
+   Here is modified a Bootstrap class!
+*/
+.popover-content {
+   color: #223036; 
+   background-color: #ecf0f1;
+}
+
+/* Font size only for the phones */
+@media (max-width: 767px) {
+   .popover-content { font-size: 12px; }
+}
+
+
+/* It is added in order to avoid problems when jumping to the different sections in the page 
+   See at: http://stackoverflow.com/questions/9047703/fixed-position-navbar-obscures-anchors
+   Also see at: https://github.com/twbs/bootstrap/issues/1768 */
+.section {
+    padding-top: 70px;
+    margin-top: -70px;
+}
+
+/* Avoiding rounded corners */
+.not-round {
+  -webkit-border-radius: 0 !important;
+     -moz-border-radius: 0 !important;
+          border-radius: 0 !important;
+}
+
+
+/* Making typography responsive - It is applaying the style only to phones */
+@media (max-width: 767px) {
+   h1 { font-size: 32px; }
+   h2 { font-size: 26px; }
+   h3 { font-size: 20px; }
+}
+
+
+.text-centered {
+  text-align: center;
+}
+
+
+.full-width {
+  width: 100%;
+}
+
+
+.not-margin {
+  margin: 0;
+}
+
+.error-msg {
+   margin-top: 40px;
+   color: #FFF;
+}
+
+/* It set the style for the navbar */
+.nav-style {
+  background-color: #223036;
+}
+
+/* It set the style for the navbar 's links */
+.nav-style a {
+  color: #ecf0f1;
+}
+
+/* Used in order to center the links in the navbar */
+.nav-centered-link {
+  line-height: 70px;
+}
+
+.nav-logo {
+   color: #f1c40f;
+   margin-left: 20px;
+}
+
+/* Font size used in the navbar only for the phones */
+@media (max-width: 767px) {
+   .nav-fz { font-size: 12px; }
+}
+
+
+/* Font size used in the navbar for tablets and upper */
+@media (min-width: 768px)  {
+   .nav-fz { font-size: 18px; }
+}
+
+
+/* In order to have a full widht row:
+  See at: http://stackoverflow.com/questions/18449918/100-width-twitter-bootstrap-3-template */
+.container-full {
+  margin: 0 auto;
+  width: 100%;
+}
+
+
+/* The image to be used in the top of a section 
+   For example, in the 'conctact' section is a phone */
+.img-center {
+   display: block;
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: auto;
+   margin-right: auto;
+   padding: 10px
+}
+
+
+/* The background color used with the images box */
+.main-color {
+  background: #025670;
+}
+
+.images-box {
+   margin-top: 20px;
+}
+
+
+/* Font size used in the navbar only for the phones */
+@media (max-width: 767px) {
+  .images-box {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.image-size {
+  max-height: 200px;
+  max-width: 200px;
+}
+
+.thumbnail {
+  background-color: #ecf0f1;
+}
+
+/* The background of the 'contact' section */
+#contact-cont {
+  background: url("../images/bg.jpg") fixed no-repeat;
+  /* It is a CSS3 tag and is not supported by IE <= 8 
+     See at: http://css-tricks.com/perfect-full-page-background-image 
+     It is possible to use a polyfill as: http://css3pie.com */
+  background-size: cover;
+
+  color: #fff;
+}
+
+
+/* Used to change the color of the contact form 's inputs */
+.form-input-color {
+    background-color: #333333;
+    color: #FFF;
+}
+
+/* It changes the setting for the contact form 's submit button */
+.form-btn {
+  background-color: #ffc00f;
+  color: #333333;
+  font-size: 20px;
+}
+
+
+/* Page footer */
+.footer-style {
+  background-color: #333333;
+  color: #FFF;
+  padding-top: 35px;
+}
+
+.footer-head-left {
+  padding-left: 35px;
+}
+
+.footer-head-left a {
+  color: #FFF;
+}
+
+.footer-foot-style {
+  background: #025670;
+  padding-top: 25px;
+}
+
+
+.footer-text-margin {
+   margin-top: 35px;
+}
+
+
+/* Making typography responsive - It is applaying the style only to phones */
+@media (max-width: 767px) {
+  .footer-text { font-size: 14px; }
+}
+
+
+/* Making typography responsive - It is applaying the style only to tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+  .footer-text { font-size: 16px; }
+}
+
+
+/* Making typography responsive - It is applaying the style from desktops and upper */
+@media (min-width: 992px) {
+  .footer-text { font-size: 20px; }
+}
+
+
+.text-contact {
+  font-size: 20px;
+  margin-top: 15px;
+  margin-bottom: 40px;
+}
+
+
+/* Line used in the footer */
+hr {
+  -moz-border-bottom-colors: none;
+  -moz-border-image: none;
+  -moz-border-left-colors: none;
+  -moz-border-right-colors: none;
+  -moz-border-top-colors: none;
+  border-color: #EEEEEE -moz-use-text-color #FFFFFF;
+  border-style: solid none;
+  border-width: 1px 0;
+  margin: 18px 0;
+}

@@ -1,0 +1,110 @@
+extends layout
+block content
+  .row.images-box
+    - var count = 0
+    each image in images1
+      if count == 0
+        .col-xs-4.col-sm-3.col-sm-offset-1.col-md-offset-2
+          a.thumbnail.image-size(href='#', data-toggle='modal', data-target='#' + image.modal)
+            img.img-responsive(src='/images/' + image.name)
+          div.modal.fade(id=image.modal, tabindex='-1', data-backdrop='false', role='dialog')
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  button.close(type='button', data-dismiss='modal') &times;
+                  h4.modal-title
+                    span.glyphicon.glyphicon-film.modal-icon &NonBreakingSpace;
+                    =image.title
+                .modal-body
+                    .row
+                      .col-xs-1
+                      .col-xs-10
+                        p
+                          span.glyphicon.glyphicon-link.modal-icon &NonBreakingSpace;
+                          a(href=image.url, target='_blank') Watch talk
+                        p
+                          span.glyphicon.glyphicon-cog.modal-icon &NonBreakingSpace;
+                          =image.oid
+                        p
+                          span.glyphicon.glyphicon-picture.modal-icon &NonBreakingSpace;
+                          =image.mid
+      else
+        .col-xs-4.col-sm-3
+          a.thumbnail.image-size(href='#', data-toggle='modal', data-target='#' + image.modal)
+            img.img-responsive(src='/images/' + image.name)
+          div.modal.fade(id=image.modal, tabindex='-1', data-backdrop='false', role='dialog')
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  button.close(type='button', data-dismiss='modal') &times;
+                  h4.modal-title
+                    span.glyphicon.glyphicon-film.modal-icon &NonBreakingSpace;
+                    =image.title
+                .modal-body
+                    .row
+                      .col-xs-1
+                      .col-xs-10
+                        p
+                          span.glyphicon.glyphicon-link.modal-icon &NonBreakingSpace;
+                          a(href=image.url, target='_blank') Watch talk
+                        p
+                          span.glyphicon.glyphicon-cog.modal-icon &NonBreakingSpace;
+                          =image.oid
+                        p
+                          span.glyphicon.glyphicon-picture.modal-icon &NonBreakingSpace;
+                          =image.mid
+      - count = count + 1
+  .row.images-box
+    - var count = 0
+    each image in images2
+      if count == 0
+        .col-xs-4.col-sm-3.col-sm-offset-1.col-md-offset-2
+          a.thumbnail.image-size(href='#', data-toggle='modal', data-target='#' + image.modal)
+            img.img-responsive(src='/images/' + image.name)
+          div.modal.fade(id=image.modal, tabindex='-1', data-backdrop='false', role='dialog')
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  button.close(type='button', data-dismiss='modal') &times;
+                  h4.modal-title
+                    span.glyphicon.glyphicon-film.modal-icon &NonBreakingSpace;
+                    =image.title
+                .modal-body
+                    .row
+                      .col-xs-1
+                      .col-xs-10
+                        p
+                          span.glyphicon.glyphicon-link.modal-icon &NonBreakingSpace;
+                          a(href=image.url, target='_blank') Watch talk
+                        p
+                          span.glyphicon.glyphicon-cog.modal-icon &NonBreakingSpace;
+                          =image.oid
+                        p
+                          span.glyphicon.glyphicon-picture.modal-icon &NonBreakingSpace;
+                          =image.mid
+      else 
+        .col-xs-4.col-sm-3
+          a.thumbnail.image-size(href='#', data-toggle='modal', data-target='#' + image.modal)
+            img.img-responsive(src='/images/' + image.name)
+          div.modal.fade(id=image.modal, tabindex='-1', data-backdrop='false', role='dialog')
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  button.close(type='button', data-dismiss='modal') &times;
+                  h4.modal-title
+                    span.glyphicon.glyphicon-film.modal-icon &NonBreakingSpace;
+                    =image.title
+                .modal-body
+                    .row
+                      .col-xs-1
+                      .col-xs-10
+                        p
+                          span.glyphicon.glyphicon-link.modal-icon &NonBreakingSpace;
+                          a(href=image.url, target='_blank') Watch talk
+                        p
+                          span.glyphicon.glyphicon-cog.modal-icon &NonBreakingSpace;
+                          =image.oid
+                        p
+                          span.glyphicon.glyphicon-picture.modal-icon &NonBreakingSpace;
+                          =image.mid
+      - count = count + 1 
