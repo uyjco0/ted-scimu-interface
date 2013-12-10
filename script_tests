@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+
+#
+# 'script_tests'
+# 
+# Copyright (C) 2013 Jorge Couchet <jorge.couchet at gmail.com>
+#
+# This file is part of 'ted-scimu'
+# 
+# 'ted-scimu' is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# 'ted-scimu' is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with 'ted-scimu'.  If not, see <http ://www.gnu.org/licenses/>.
+#
+
+
+import socket
+import subprocess
+import time
+import unittest
+
+QRY_SERVER_PORT = 9777
+QRY_SERVER_ADDR = ("127.0.0.1", QRY_SERVER_PORT)
+
+def get_new_images(qry_server_addr, img_number):
+    """
+    It implements the client functionality in order to talk with the TCP server
+    through the protocol defined by the TCP server.
+    """
+    res = []
+    f = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        f.connect(qry_server_addr)
+        f.sendall(str(img_number).encode("UTF-8") + '\n')
+        f.sendall('##END_SEND##' + '\n')
+
+        response = f.recv(1024).strip()
+        res = (response.split())[1:]
+    except Exception as e:
+        print e
+    finally:
+        f.close()
+    return res
+
+
+class QryServerTest(unittest.TestCase):
+
+    def setUp(self):
+        self.process = subprocess.Popen(["qry_server/qry_server", "-f", "tests", "-l", "/dev/null"])
+        time.sleep(0.1)
+
+    def tearDown(self):
+        self.process.kill()
+
+    def test_t1(self):
+        res = get_new_images(QRY_SERVER_ADDR, 2)
+        self.assertEqual(len(res), 2)
+
+    def test_t2(self):
+        res = get_new_images(QRY_SERVER_ADDR, 10)
+        self.assertEqual(len(res), 0)
+
+if __name__ == "__main__":
+    unittest.main()
+
